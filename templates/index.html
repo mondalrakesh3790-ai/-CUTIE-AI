@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUTIE AI - Professional Voice Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a2a3a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(18, 28, 40, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid #2a3a4a;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2a4a6a 100%);
+            padding: 30px;
+            border-bottom: 1px solid #3a5a7a;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #a0b8cc;
+            font-weight: 400;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: #1a2a3a;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2a3a4a;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .status-text {
+            font-weight: 600;
+            color: #a0b8cc;
+        }
+        
+        .wake-word {
+            background: #0a1929;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #3a5a7a;
+            font-size: 0.95em;
+        }
+        
+        .wake-word span {
+            color: #4caf50;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .command-hint {
+            margin-left: auto;
+            color: #a0b8cc;
+            font-size: 0.95em;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 550px;
+        }
+        
+        /* Commands Panel */
+        .commands-panel {
+            background: #122232;
+            padding: 25px;
+            border-right: 1px solid #2a3a4a;
+        }
+        
+        .commands-header {
+            margin-bottom: 25px;
+        }
+        
+        .commands-header h3 {
+            color: #fff;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .commands-header h3 i {
+            color: #4caf50;
+            font-style: normal;
+            font-size: 1.2em;
+        }
+        
+        .command-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .command-category {
+            margin-bottom: 20px;
+        }
+        
+        .category-title {
+            color: #a0b8cc;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .command-item {
+            background: #1a2a3a;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid #4caf50;
+            transition: all 0.2s;
+        }
+        
+        .command-item:hover {
+            background: #1e3a5f;
+            transform: translateX(5px);
+        }
+        
+        .command-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 0.95em;
+        }
+        
+        .command-desc {
+            color: #a0b8cc;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            background: #0f1a24;
+            display: flex;
+            flex-direction: column;
+            height: 550px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .bot-message {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 75%;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .user-message .message-content {
+            background: #1e3a5f;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message .message-content {
+            background: #1a2a3a;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-time {
+            font-size: 0.7em;
+            margin-top: 6px;
+            opacity: 0.6;
+            text-align: right;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 18px;
+            background: #1a2a3a;
+            border-radius: 14px;
+            width: fit-content;
+        }
+        
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+        
+        /* Input Area */
+        .input-area {
+            padding: 20px 25px;
+            background: #122232;
+            border-top: 1px solid #2a3a4a;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            background: #1a2a3a;
+            border-radius: 40px;
+            padding: 4px 20px;
+            border: 1px solid #2a3a4a;
+            transition: all 0.3s;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            background: transparent;
+            font-size: 0.95em;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            outline: none;
+        }
+        
+        .chat-input::placeholder {
+            color: #5a6a7a;
+        }
+        
+        .send-btn {
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #2a6a4a 0%, #1e5a3a 100%);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #0a1929;
+            color: #5a6a7a;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            border-top: 1px solid #1a2a3a;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a2a3a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #2a4a6a;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a5a7a;
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .commands-panel {
+                display: none;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .command-hint {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>CUTIE AI</h1>
+            <p>Professional Voice Assistant • Always Ready</p>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">VOICE ACTIVE</span>
+            </div>
+            <div class="wake-word">
+                WAKE WORD: <span>"HEY CUTIE"</span>
+            </div>
+            <div class="command-hint">
+                Say "Hey Cutie" + your command
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Commands Panel -->
+            <div class="commands-panel">
+                <div class="commands-header">
+                    <h3><i>⌘</i> VOICE COMMANDS</h3>
+                </div>
+                
+                <div class="command-list">
+                    <div class="command-category">
+                        <div class="category-title">System Control</div>
+                        <div class="command-item">
+                            <div class="command-name">Volume Control</div>
+                            <div class="command-desc">"volume up" / "volume down"</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-name">Brightness Control</div>
+                            <div class="command-desc">"brightness up" / "brightness down"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="command-category">
+                        <div class="category-title">Applications</div>
+                        <div class="command-item">
+                            <div class="command-name">Open App</div>
+                            <div class="command-desc">"open chrome" / "open notepad"</div>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-name">Close Window</div>
+                            <div class="command-desc">"close" / "band karo"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="command-category">
+                        <div class="category-title">Communication</div>
+                        <div class="command-item">
+                            <div class="command-name">WhatsApp</div>
+                            <div class="command-desc">"whatsapp message"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="command-category">
+                        <div class="category-title">Information</div>
+                        <div class="command-item">
+                            <div class="command-name">Time & Date</div>
+                            <div class="command-desc">"what's the time?" / "today's date"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="command-category">
+                        <div class="category-title">Power</div>
+                        <div class="command-item">
+                            <div class="command-name">System Control</div>
+                            <div class="command-desc">"shutdown" / "restart"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="command-category">
+                        <div class="category-title">General</div>
+                        <div class="command-item">
+                            <div class="command-name">Chat</div>
+                            <div class="command-desc">Ask anything normally</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Panel -->
+            <div class="chat-panel">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <div>Hello {{ user_name }}. Voice control is active. Say "Hey Cutie" followed by your command, or type your message below.</div>
+                            <div class="message-time">System ready</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <input type="text" class="chat-input" id="userInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    </div>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            CUTIE AI • Voice Control Active • Say "Hey Cutie" • © 2024
+        </div>
+    </div>
+    
+    <script>
+        let isLoading = false;
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role === 'user' ? 'user-message' : 'bot-message'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div>${content}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'message bot-message';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(indicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message || isLoading) return;
+            
+            userInput.value = '';
+            addMessage('user', message);
+            
+            isLoading = true;
+            sendBtn.disabled = true;
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: message})
+                });
+                
+                const data = await response.json();
+                removeTypingIndicator();
+                addMessage('assistant', data.response);
+                
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('assistant', 'Connection error. Please try again.');
+            } finally {
+                isLoading = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+        
+        // Check status periodically
+        setInterval(async () => {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                if (!data.voice_active) {
+                    console.log('Voice inactive');
+                }
+            } catch (error) {
+                console.error('Status check failed');
+            }
+        }, 5000);
+        
+        // Focus input on load
+        userInput.focus();
+    </script>
+</body>
+</html>
