@@ -364,6 +364,7 @@ def status():
     })
 
 # ==================== START APPLICATION ====================
+
 if __name__ == '__main__':
     print("=" * 60)
     print("CUTIE AI - PROFESSIONAL VOICE ASSISTANT")
@@ -386,7 +387,6 @@ if __name__ == '__main__':
     print("🎤 Voice control is ACTIVE - Say 'Hey Cutie'")
     print("=" * 60)
     
-    # Run Flask app
-    if __name__ == '__main__':
+    # Run Flask app - FIXED FOR RENDER
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
