@@ -9,18 +9,34 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import threading
 import time
-import speech_recognition as sr
-import pyttsx3
-import pyautogui
-import pyperclip
-import screen_brightness_control as sbc
 import os
 import datetime
 import logging
 import queue
 
+# ==================== CHECK RENDER ENVIRONMENT ====================
+# Check if we're running on Render
+ON_RENDER = os.environ.get('RENDER', False)
+
+# Only import GUI/screen-dependent libraries when NOT on Render
+if not ON_RENDER:
+    import speech_recognition as sr
+    import pyttsx3
+    import pyautogui
+    import pyperclip
+    import screen_brightness_control as sbc
+else:
+    print("🎤 Running on Render: Voice and GUI features are disabled.")
+    print("💬 Chat interface will work normally!")
+    # Create dummy modules to prevent import errors
+    sr = None
+    pyttsx3 = None
+    pyautogui = None
+    pyperclip = None
+    sbc = None
+
 # ==================== CONFIGURATION ====================
-GROQ_API_KEY = "YOUR_API_KEY_HERE"  # You'll add this on Render
+GROQ_API_KEY = "YOUR_API_KEY_HERE"  # Add your Groq API key here
 USER_NAME = "Rakesh"
 
 app = Flask(__name__)
@@ -28,7 +44,7 @@ CORS(app)
 
 # Initialize components
 conversation_history = []
-voice_system_active = True
+voice_system_active = not ON_RENDER  # Disable voice on Render
 voice_thread = None
 command_queue = queue.Queue()
 voice_feedback_queue = queue.Queue()
@@ -37,18 +53,20 @@ voice_feedback_queue = queue.Queue()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize TTS engine (offline, no activation needed)
-try:
-    tts_engine = pyttsx3.init()
-    tts_engine.setProperty('rate', 170)
-    tts_engine.setProperty('volume', 0.9)
-    # Get male voice if available
-    voices = tts_engine.getProperty('voices')
-    if len(voices) > 0:
-        tts_engine.setProperty('voice', voices[0].id)  # Male voice
-except Exception as e:
-    logger.error(f"TTS init error: {e}")
-    tts_engine = None
+# Initialize TTS engine (only if not on Render)
+tts_engine = None
+if not ON_RENDER:
+    try:
+        tts_engine = pyttsx3.init()
+        tts_engine.setProperty('rate', 170)
+        tts_engine.setProperty('volume', 0.9)
+        # Get male voice if available
+        voices = tts_engine.getProperty('voices')
+        if len(voices) > 0:
+            tts_engine.setProperty('voice', voices[0].id)  # Male voice
+    except Exception as e:
+        logger.error(f"TTS init error: {e}")
+        tts_engine = None
 
 # Available Groq models
 GROQ_MODELS = {
@@ -109,9 +127,14 @@ def ask_groq(user_message):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# ==================== VOICE FUNCTIONS ====================
+# ==================== VOICE FUNCTIONS (Only work locally) ====================
 def speak(text):
-    """Text to speech function"""
+    """Text to speech function - disabled on Render"""
+    if ON_RENDER:
+        # On Render, just log the message
+        print(f"CUTIE: {text}")
+        return
+    
     try:
         if tts_engine:
             tts_engine.say(text)
@@ -122,7 +145,13 @@ def speak(text):
         logger.error(f"Speech error: {e}")
 
 def system_control(command):
-    """Execute system commands"""
+    """Execute system commands - disabled on Render"""
+    if ON_RENDER:
+        # On Render, return message that this feature isn't available
+        if any(word in command.lower() for word in ["volume", "brightness", "open", "close", "shutdown", "restart"]):
+            return "System control commands are only available when running locally, not on Render."
+        return None
+    
     cmd = command.lower()
     
     # Volume control
@@ -140,14 +169,14 @@ def system_control(command):
         try:
             curr = sbc.get_brightness()[0]
             sbc.set_brightness(min(curr + 20, 100))
-            return f"Brightness increased"
+            return "Brightness increased"
         except:
             return "Brightness control not available"
     elif "brightness down" in cmd:
         try:
             curr = sbc.get_brightness()[0]
             sbc.set_brightness(max(curr - 20, 0))
-            return f"Brightness decreased"
+            return "Brightness decreased"
         except:
             return "Brightness control not available"
     
@@ -177,6 +206,8 @@ def system_control(command):
     
     # WhatsApp
     elif "whatsapp" in cmd or "message" in cmd:
+        if ON_RENDER:
+            return "WhatsApp messaging is only available when running locally."
         return "WHATSAPP_MODE"
     
     # Shutdown
@@ -198,7 +229,10 @@ def system_control(command):
     return None
 
 def whatsapp_mode(recognizer, source):
-    """Handle WhatsApp message sending"""
+    """Handle WhatsApp message sending - only works locally"""
+    if ON_RENDER:
+        return "WhatsApp mode is not available on Render"
+    
     try:
         speak("Who should I send the message to?")
         
@@ -246,7 +280,11 @@ def whatsapp_mode(recognizer, source):
         return "Sorry, I couldn't send the message"
 
 def voice_loop():
-    """Main voice control loop with fixed timeout errors"""
+    """Main voice control loop - only runs locally"""
+    if ON_RENDER:
+        logger.info("Voice loop disabled on Render")
+        return
+    
     logger.info("Voice control started - Say 'Hey Cutie' to interact")
     
     r = sr.Recognizer()
@@ -345,7 +383,7 @@ def chat():
         cmd_result = system_control(message.lower())
         
         if cmd_result == "WHATSAPP_MODE":
-            return jsonify({"response": "Please use voice for WhatsApp messages"})
+            return jsonify({"response": "Please use voice for WhatsApp messages when running locally"})
         elif cmd_result:
             return jsonify({"response": cmd_result})
         else:
@@ -360,31 +398,43 @@ def chat():
 def status():
     return jsonify({
         "voice_active": voice_system_active,
-        "time": datetime.datetime.now().isoformat()
+        "time": datetime.datetime.now().isoformat(),
+        "on_render": ON_RENDER
     })
 
 # ==================== START APPLICATION ====================
-
 if __name__ == '__main__':
     print("=" * 60)
     print("CUTIE AI - PROFESSIONAL VOICE ASSISTANT")
     print("=" * 60)
-    print("\n✅ NO ACTIVATION REQUIRED")
-    print("✅ Voice timeout errors FIXED")
-    print("\n🎤 VOICE COMMANDS:")
-    print("   Wake word: 'Hey Cutie'")
-    print("   • System: 'volume up/down', 'brightness up/down'")
-    print("   • Apps: 'open chrome', 'close window'")
-    print("   • WhatsApp: 'whatsapp message'")
-    print("   • Info: 'what's the time?', 'today's date'")
-    print("   • Power: 'shutdown', 'restart'")
-    print("\n🌐 Web Interface: http://localhost:5000")
+    
+    if ON_RENDER:
+        print("\n🌐 RUNNING ON RENDER")
+        print("✅ Voice features are disabled")
+        print("✅ Chat interface is ACTIVE")
+        print("\n💬 Chat with CUTIE AI normally!")
+    else:
+        print("\n✅ NO ACTIVATION REQUIRED")
+        print("✅ Voice timeout errors FIXED")
+        print("\n🎤 VOICE COMMANDS:")
+        print("   Wake word: 'Hey Cutie'")
+        print("   • System: 'volume up/down', 'brightness up/down'")
+        print("   • Apps: 'open chrome', 'close window'")
+        print("   • WhatsApp: 'whatsapp message'")
+        print("   • Info: 'what's the time?', 'today's date'")
+        print("   • Power: 'shutdown', 'restart'")
+    
+    print("\n🌐 Web Interface: http://localhost:5000" if not ON_RENDER else f"\n🌐 Live URL: https://cutie-ai-gyfu.onrender.com")
     print("=" * 60)
     
-    # Start voice control automatically
-    voice_thread = threading.Thread(target=voice_loop, daemon=True)
-    voice_thread.start()
-    print("🎤 Voice control is ACTIVE - Say 'Hey Cutie'")
+    # Start voice control automatically (only if not on Render)
+    if not ON_RENDER:
+        voice_thread = threading.Thread(target=voice_loop, daemon=True)
+        voice_thread.start()
+        print("🎤 Voice control is ACTIVE - Say 'Hey Cutie'")
+    else:
+        print("💬 Chat interface ready - Voice disabled on Render")
+    
     print("=" * 60)
     
     # Run Flask app - FIXED FOR RENDER
