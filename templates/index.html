@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Athena · classic assistant</title>
-    <!-- classic & premium fonts: Playfair Display for headings, Inter for UI -->
+    <title>Athena · CUTIE AI Assistant</title>
+    <!-- classic & premium fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- subtle Font Awesome for classic icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* (apnar existing CSS style gulo same thakbe) */
         * {
             margin: 0;
             padding: 0;
@@ -19,7 +20,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #1e1c1a;  /* warm dark base */
+            background: #1e1c1a;
             background: radial-gradient(circle at 10% 20%, #2e2b28 0%, #12100e 100%);
             display: flex;
             justify-content: center;
@@ -39,30 +40,26 @@
             border-radius: 36px 36px 30px 30px;
             box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(212, 175, 55, 0.1) inset;
             overflow: hidden;
-            transition: all 0.2s ease;
         }
 
-        /* header: deep navy + gold accent — now with classic name only */
         .header {
             background: #0f1c27;
             background: linear-gradient(145deg, #102433 0%, #1a2c3d 100%);
             padding: 30px 20px 22px 20px;
             text-align: center;
             border-bottom: 2px solid #c5a028;
-            position: relative;
         }
 
         .header h2 {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 3.2rem;          /* slightly larger for elegance */
+            font-size: 3.2rem;
             letter-spacing: 2px;
             color: #e5d9b5;
             text-shadow: 3px 3px 0 #0a141c, 6px 6px 0 rgba(170, 140, 60, 0.15);
-            margin-bottom: 0;              /* removed extra space */
+            margin-bottom: 0;
         }
 
-        /* gold separator line (kept for classic beauty) */
         .gold-sep {
             height: 2px;
             background: linear-gradient(90deg, transparent, #c9ae62, #ffe6a6, #c9ae62, transparent);
@@ -71,7 +68,6 @@
             border-radius: 4px;
         }
 
-        /* status bar — now refined, only "Voice active · classic listening" */
         .status {
             padding: 12px 10px;
             background: #1e241e;
@@ -98,9 +94,7 @@
             100% { opacity: 0.7; transform: scale(1); }
         }
 
-        /* chat messages area */
         .chat-messages {
-            background: #1a1c1a;
             background: linear-gradient(165deg, #191e22 0%, #23282e 100%);
             padding: 25px 25px 15px 25px;
             min-height: 380px;
@@ -153,7 +147,6 @@
         }
 
         .user .bubble {
-            background: #2b4638;
             background: linear-gradient(135deg, #2b4f3a, #1e3f2d);
             color: #f2ecd9;
             border-bottom-right-radius: 8px;
@@ -162,7 +155,6 @@
         }
 
         .bot .bubble {
-            background: #252c33;
             background: linear-gradient(135deg, #2e3840, #1f282f);
             color: #ece3cf;
             border-bottom-left-radius: 8px;
@@ -172,7 +164,7 @@
 
         .bot .bubble::before {
             font-family: "Font Awesome 6 Free";
-            content: "\f0a5";  /* fa-robot */
+            content: "\f0a5";
             font-weight: 900;
             position: absolute;
             left: -18px;
@@ -188,7 +180,7 @@
 
         .user .bubble::after {
             font-family: "Font Awesome 6 Free";
-            content: "\f007";  /* fa-user */
+            content: "\f007";
             font-weight: 900;
             position: absolute;
             right: -18px;
@@ -202,11 +194,9 @@
             border: 1px solid #6f8f72;
         }
 
-        /* input area */
         .input-area {
             display: flex;
             padding: 20px 25px 25px 25px;
-            background: #161a1c;
             background: linear-gradient(145deg, #1b2125, #13181b);
             border-top: 1px solid #544f3e;
             gap: 14px;
@@ -237,11 +227,9 @@
             padding: 15px 25px 15px 52px;
             font-size: 1rem;
             color: #ede7d7;
-            font-weight: 400;
             outline: none;
-            transition: all 0.2s;
+            transition: 0.2s;
             font-family: 'Inter', sans-serif;
-            letter-spacing: 0.2px;
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
         }
 
@@ -251,15 +239,7 @@
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), inset 0 2px 6px #000;
         }
 
-        #input::placeholder {
-            color: #5f615a;
-            font-style: italic;
-            font-weight: 300;
-            opacity: 0.7;
-        }
-
         button {
-            background: #24323d;
             background: linear-gradient(145deg, #3c4a54, #1d2b33);
             border: 1.5px solid #ad8f4c;
             color: #f0e8d2;
@@ -292,39 +272,90 @@
             transform: translateY(4px);
             box-shadow: 0 4px 0 #0a1217;
         }
+
+        .connection-status {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
+            margin-left: 10px;
+        }
+        
+        .connected {
+            color: #4caf50;
+        }
+        
+        .disconnected {
+            color: #f44336;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h2>Athena</h2>                    <!-- classic name, voice line removed -->
+        <h2>Athena</h2>
         <div class="gold-sep"></div>
-        <!-- nothing else: clean and classic -->
     </div>
 
     <div class="status">
-        <i class="fas fa-circle"></i> <span>Voice active · classic listening</span> <i class="fas fa-chevron-right" style="font-size: 0.8rem; opacity:0.8;"></i>
+        <i class="fas fa-circle"></i> 
+        <span>Bangla Voice Assistant</span>
+        <span id="apiStatus" class="connection-status disconnected">● Connecting...</span>
     </div>
 
     <div class="chat-messages" id="chat">
-        <!-- classic welcome message from Athena -->
         <div class="message bot">
-            <div class="bubble">Good day. I'm Athena, your personal assistant. How may I help you?</div>
+            <div class="bubble">নমস্কার! আমি Athena, আপনার ব্যক্তিগত সহায়ক। কিভাবে সাহায্য করতে পারি?</div>
         </div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
             <i class="fas fa-pen-nib"></i>
-            <input type="text" id="input" placeholder="Write a message...">
+            <input type="text" id="input" placeholder="এখানে লিখুন...">
         </div>
-        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
+        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> পাঠান</button>
     </div>
 </div>
 
 <script>
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
+    const apiStatus = document.getElementById("apiStatus");
+    
+    // ========== Render API URL - এখানে আপনার Render URL দিন ==========
+    const RENDER_API_URL = "https://cutie-ai.onrender.com"; // আপনার Render URL দিন
+    // =================================================================
+
+    function updateApiStatus(connected, message) {
+        if (connected) {
+            apiStatus.innerHTML = '● Connected';
+            apiStatus.className = 'connection-status connected';
+        } else {
+            apiStatus.innerHTML = `● ${message || 'Disconnected'}`;
+            apiStatus.className = 'connection-status disconnected';
+        }
+    }
+
+    // Check API connection on load
+    async function checkApiConnection() {
+        try {
+            const response = await fetch(`${RENDER_API_URL}/status`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                updateApiStatus(true, 'Connected');
+                console.log('API connected:', data);
+            } else {
+                updateApiStatus(false, 'API Error');
+            }
+        } catch (e) {
+            console.error('API connection failed:', e);
+            updateApiStatus(false, 'Offline');
+        }
+    }
 
     function addMessage(text, type) {
         const div = document.createElement("div");
@@ -334,7 +365,6 @@
         chat.scrollTop = chat.scrollHeight;
     }
 
-    // backend endpoint (kept as original)
     async function sendMessage(msg = null) {
         const message = msg || input.value.trim();
         if (!message) return;
@@ -343,20 +373,21 @@
         input.value = "";
 
         try {
-            const res = await fetch("/chat", {
+            // Render API তে request পাঠানো
+            const res = await fetch(`${RENDER_API_URL}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: message })
             });
+            
             const data = await res.json();
             addMessage(data.response, "bot");
             speak(data.response);
         } catch (e) {
-            // fallback for demo (premium offline message)
-            console.warn("Server not reachable — using fallback echo");
-            const fallback = "I seem to be offline, but I heard: \"" + message + "\". (Athena echo)";
+            console.warn("Server not reachable:", e);
+            const fallback = "সার্ভার এ সমস্যা। দয়া করে আবার চেষ্টা করুন।";
             addMessage(fallback, "bot");
-            speak(fallback);
+            updateApiStatus(false, 'Offline');
         }
     }
 
@@ -364,28 +395,37 @@
         if (e.key === "Enter") sendMessage();
     });
 
-    // ================= VOICE SYSTEM (unchanged, trigger phrase remains) =================
+    // ================= VOICE SYSTEM =================
     let recognition;
     let listening = false;
 
     if ('webkitSpeechRecognition' in window) {
         recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
-        recognition.lang = 'en-IN';
+        recognition.lang = 'bn-BD';  // Bangla language
         recognition.interimResults = false;
 
         recognition.onresult = function (event) {
             const transcript = event.results[event.results.length - 1][0].transcript.trim();
             console.log("Heard:", transcript);
 
-            if (transcript.toLowerCase().includes("hey cutie")) {
-                // trigger phrase unchanged — you may replace with "hey athena" if you wish
-                let command = transcript.toLowerCase().replace("hey cutie", "").trim();
+            // Wake word check - both English and Bangla
+            if (transcript.toLowerCase().includes("hey cutie") || 
+                transcript.toLowerCase().includes("কিউটি") ||
+                transcript.toLowerCase().includes("আথেনা")) {
+                
+                let command = transcript.toLowerCase()
+                    .replace("hey cutie", "")
+                    .replace("কিউটি", "")
+                    .replace("আথেনা", "")
+                    .trim();
+                
                 command = command.replace(/^[.,!?;:]+/, '').trim();
+                
                 if (command.length > 0) {
                     sendMessage(command);
                 } else {
-                    sendMessage("hello");   // polite nudge
+                    sendMessage("হ্যালো");   // polite nudge
                 }
             }
         };
@@ -397,32 +437,46 @@
         recognition.start();
         listening = true;
     } else {
-        // gracefully show voice not supported
         const statusDiv = document.querySelector('.status');
         if (statusDiv) {
-            statusDiv.innerHTML = `<i class="fas fa-microphone-slash" style="color:#b48b5a;"></i> Voice not supported · classic typing only`;
+            statusDiv.innerHTML = `<i class="fas fa-microphone-slash" style="color:#b48b5a;"></i> Voice not supported`;
         }
     }
 
-    // Text-to-Speech (premium voice)
+    // Text-to-Speech with Bangla support
     function speak(text) {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
         const speech = new SpeechSynthesisUtterance(text);
-        speech.lang = "en-IN";
-        speech.rate = 0.95;
-        speech.pitch = 1.1;
+        
+        // Try Bangla voice first
         const voices = window.speechSynthesis.getVoices();
-        const preferred = voices.find(v => v.lang === 'en-IN' && v.name.includes('Female'));
-        if (preferred) speech.voice = preferred;
+        const banglaVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('ben'));
+        const indianVoice = voices.find(v => v.lang === 'en-IN');
+        
+        if (banglaVoice) {
+            speech.voice = banglaVoice;
+            speech.lang = 'bn-BD';
+        } else if (indianVoice) {
+            speech.voice = indianVoice;
+            speech.lang = 'en-IN';
+        }
+        
+        speech.rate = 0.9;
+        speech.pitch = 1.2;
         window.speechSynthesis.speak(speech);
     }
 
     if (window.speechSynthesis) {
-        window.speechSynthesis.getVoices(); // preload
+        window.speechSynthesis.getVoices();
     }
+
+    // Check API connection on load
+    checkApiConnection();
+    // Check every 30 seconds
+    setInterval(checkApiConnection, 30000);
 </script>
 <!-- small classic signature -->
-<div style="position: fixed; bottom: 6px; right: 20px; opacity:0.3; font-size: 12px; color: #bba十五;">Athena · classic edition</div>
+<div style="position: fixed; bottom: 6px; right: 20px; opacity:0.3; font-size: 12px; color: #bba十五;">Athena · CUTIE AI</div>
 </body>
 </html>
