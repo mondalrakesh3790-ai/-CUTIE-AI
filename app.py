@@ -38,8 +38,13 @@ else:
     print("📢 Running on Render - Audio features disabled")
 
 # ==================== CONFIGURATION ====================
-GROQ_API_KEY = "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"  # You'll add this on Render
-USER_NAME = "khanki magi"
+# Get API key from environment variable (set this in Render dashboard)
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+if not GROQ_API_KEY:
+    print("⚠️ WARNING: GROQ_API_KEY not set in environment variables")
+    print("Please set it in Render dashboard or locally")
+
+USER_NAME = os.environ.get('USER_NAME', 'khanki magi')  # Can be set in env
 
 app = Flask(__name__)
 CORS(app)
@@ -54,6 +59,16 @@ voice_feedback_queue = queue.Queue()
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Available Groq models
+GROQ_MODELS = {
+    "llama-3.3-70b": "llama-3.3-70b-versatile",
+    "llama-3.1-8b": "llama-3.1-8b-instant",
+    "mixtral": "mixtral-8x7b-32768",
+    "gemma2": "gemma2-9b-it"
+}
+
+DEFAULT_MODEL = GROQ_MODELS["llama-3.1-8b"]
 
 # ==================== BANGLA ACCENT VOICE SETUP ====================
 class BanglaAccentVoice:
@@ -238,6 +253,9 @@ bangla_voice = BanglaAccentVoice()
 def ask_groq(user_message):
     """Get response from Groq API"""
     
+    if not GROQ_API_KEY:
+        return "Groq API key not configured. Please set GROQ_API_KEY in environment variables."
+    
     messages = [
         {"role": "system", "content": f"""You are CUTIE AI, a helpful AI assistant. 
          User's name is {USER_NAME}. Be professional, concise, and helpful. 
@@ -259,7 +277,7 @@ def ask_groq(user_message):
                 "Content-Type": "application/json"
             },
             json={
-                "model": "llama-3.1-8b-instant",
+                "model": DEFAULT_MODEL,
                 "messages": messages,
                 "temperature": 0.7,
                 "max_tokens": 500
@@ -278,8 +296,10 @@ def ask_groq(user_message):
                 conversation_history[:] = conversation_history[-20:]
             
             return ai_response
+        elif response.status_code == 401:
+            return "Error: Invalid Groq API key. Please check your API key."
         else:
-            return f"Error: {response.status_code}"
+            return f"Error: {response.status_code} - {response.text}"
             
     except Exception as e:
         return f"Error: {str(e)}"
@@ -522,26 +542,40 @@ def voice_loop():
 # ==================== FLASK ROUTES ====================
 @app.route('/')
 def home():
+    """Root endpoint - API info"""
     return jsonify({
         "status": "CUTIE AI is running",
         "message": "Welcome to CUTIE AI - Bangla Accent Voice Assistant",
+        "version": "1.0.0",
         "features": {
             "voice_active": AUDIO_AVAILABLE and not IS_RENDER,
             "bangla_accent": True,
-            "system_commands": not IS_RENDER
+            "system_commands": not IS_RENDER,
+            "groq_api_configured": bool(GROQ_API_KEY)
         },
         "user": USER_NAME,
-        "time": datetime.datetime.now().isoformat()
+        "time": datetime.datetime.now().isoformat(),
+        "endpoints": {
+            "chat": "/chat (POST)",
+            "status": "/status (GET)"
+        }
     })
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    """Chat endpoint - handles text messages"""
     try:
         data = request.json
+        if not data:
+            return jsonify({"response": "No data received"}), 400
+            
         message = data.get('message', '')
         
         if not message:
             return jsonify({"response": "Kichu bolen"})
+        
+        # Log the request
+        logger.info(f"Chat request: {message[:50]}...")
         
         # Check for system commands
         cmd_result = system_control(message.lower())
@@ -556,15 +590,51 @@ def chat():
             return jsonify({"response": response})
     
     except Exception as e:
-        return jsonify({"response": f"Error: {str(e)}"})
+        logger.error(f"Chat error: {e}")
+        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 @app.route('/status')
 def status():
+    """Status endpoint"""
     return jsonify({
         "voice_active": AUDIO_AVAILABLE and not IS_RENDER,
         "time": datetime.datetime.now().isoformat(),
-        "environment": "render" if IS_RENDER else "local"
+        "environment": "render" if IS_RENDER else "local",
+        "groq_api_configured": bool(GROQ_API_KEY),
+        "conversation_length": len(conversation_history)
     })
+
+@app.route('/test-groq', methods=['GET'])
+def test_groq():
+    """Test Groq API connection"""
+    if not GROQ_API_KEY:
+        return jsonify({"error": "GROQ_API_KEY not configured"}), 400
+    
+    try:
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": DEFAULT_MODEL,
+                "messages": [{"role": "user", "content": "Say 'test successful'"}],
+                "temperature": 0.7,
+                "max_tokens": 10
+            },
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            return jsonify({"status": "success", "message": "Groq API working"})
+        elif response.status_code == 401:
+            return jsonify({"status": "error", "message": "Invalid API key"}), 401
+        else:
+            return jsonify({"status": "error", "message": f"HTTP {response.status_code}"}), response.status_code
+            
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # ==================== START APPLICATION ====================
 
@@ -573,10 +643,20 @@ if __name__ == '__main__':
     print("CUTIE AI - BANGLA ACCENT VOICE ASSISTANT")
     print("=" * 60)
     
+    # Check Groq API key
+    if GROQ_API_KEY:
+        print("✅ Groq API key configured")
+        # Test first few characters for debugging
+        print(f"   Key starts with: {GROQ_API_KEY[:8]}...")
+    else:
+        print("❌ Groq API key NOT configured")
+        print("   Set GROQ_API_KEY in environment variables")
+    
     if IS_RENDER:
         print("\n📢 RUNNING ON RENDER - Audio features disabled")
-        print("✅ Web interface available at / endpoint")
+        print("✅ Web API available at / endpoint")
         print("✅ Chat API available at /chat")
+        print("✅ Test Groq at /test-groq")
     else:
         print("\n✅ BANGLA ACCENT VOICE ACTIVE")
         print("✅ NO ACTIVATION REQUIRED")
@@ -590,7 +670,9 @@ if __name__ == '__main__':
         print("   • Date: 'tarikh?', 'date?'")
         print("   • Power: 'shutdown', 'band kor'")
     
-    print("\n🌐 Web Interface: http://localhost:5000")
+    print("\n🌐 Local URL: http://localhost:5000")
+    if IS_RENDER:
+        print("🌐 Render URL: Your Render app URL")
     print("=" * 60)
     
     if not IS_RENDER and AUDIO_AVAILABLE:
@@ -617,4 +699,5 @@ if __name__ == '__main__':
     
     # Run Flask app - FIXED FOR RENDER
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)  # debug=False for Render
+    debug_mode = not IS_RENDER  # Disable debug on Render
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
