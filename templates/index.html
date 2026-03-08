@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Athena · CUTIE AI Assistant</title>
-    <!-- classic & premium fonts -->
+    <title>Athena · CUTIE AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* (apnar existing CSS style gulo same thakbe) */
         * {
             margin: 0;
             padding: 0;
@@ -31,8 +28,8 @@
         }
 
         .container {
-            width: 90%;
-            max-width: 1000px;
+            width: 95%;
+            max-width: 900px;
             background: rgba(18, 16, 14, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -45,7 +42,7 @@
         .header {
             background: #0f1c27;
             background: linear-gradient(145deg, #102433 0%, #1a2c3d 100%);
-            padding: 30px 20px 22px 20px;
+            padding: 25px 20px 20px 20px;
             text-align: center;
             border-bottom: 2px solid #c5a028;
         }
@@ -53,71 +50,89 @@
         .header h2 {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 3.2rem;
+            font-size: 2.8rem;
             letter-spacing: 2px;
             color: #e5d9b5;
             text-shadow: 3px 3px 0 #0a141c, 6px 6px 0 rgba(170, 140, 60, 0.15);
-            margin-bottom: 0;
+            margin-bottom: 5px;
         }
 
         .gold-sep {
             height: 2px;
             background: linear-gradient(90deg, transparent, #c9ae62, #ffe6a6, #c9ae62, transparent);
             width: 40%;
-            margin: 12px auto 6px auto;
+            margin: 8px auto;
             border-radius: 4px;
         }
 
-        .status {
-            padding: 12px 10px;
+        .status-bar {
+            padding: 10px 15px;
             background: #1e241e;
             color: #d4c8a8;
-            text-align: center;
-            font-size: 0.95rem;
-            font-weight: 500;
-            border-bottom: 1px solid #404035;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #404035;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .status i {
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-item i {
             color: #dbb957;
-            font-size: 1.1rem;
-            animation: pulse 1.8s infinite;
+            font-size: 0.9rem;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.15); text-shadow: 0 0 5px gold; }
-            100% { opacity: 0.7; transform: scale(1); }
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .connected {
+            color: #4caf50;
+        }
+        
+        .disconnected {
+            color: #f44336;
         }
 
         .chat-messages {
             background: linear-gradient(165deg, #191e22 0%, #23282e 100%);
-            padding: 25px 25px 15px 25px;
-            min-height: 380px;
-            max-height: 480px;
+            padding: 20px;
+            min-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
-            scroll-behavior: smooth;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+            gap: 15px;
         }
 
         .chat-messages::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         .chat-messages::-webkit-scrollbar-track {
             background: #2b2f33;
-            border-radius: 20px;
         }
         .chat-messages::-webkit-scrollbar-thumb {
             background: #746b4e;
             border-radius: 20px;
-            border: 1px solid #a58f5a;
         }
 
         .message {
@@ -134,73 +149,38 @@
         }
 
         .bubble {
-            max-width: 70%;
-            padding: 14px 22px;
-            font-size: 1rem;
+            max-width: 80%;
+            padding: 12px 18px;
+            font-size: 0.95rem;
             line-height: 1.5;
-            border-radius: 30px;
-            font-weight: 400;
-            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.5);
+            border-radius: 25px;
+            box-shadow: 0 4px 10px -5px rgba(0,0,0,0.5);
             position: relative;
-            font-family: 'Inter', sans-serif;
             word-break: break-word;
         }
 
         .user .bubble {
             background: linear-gradient(135deg, #2b4f3a, #1e3f2d);
             color: #f2ecd9;
-            border-bottom-right-radius: 8px;
+            border-bottom-right-radius: 5px;
             border: 1px solid #6f8f72;
-            box-shadow: -4px 4px 0 #0f2b1c;
         }
 
         .bot .bubble {
             background: linear-gradient(135deg, #2e3840, #1f282f);
             color: #ece3cf;
-            border-bottom-left-radius: 8px;
+            border-bottom-left-radius: 5px;
             border: 1px solid #6a6f5a;
-            box-shadow: 4px 4px 0 #0f1419;
-        }
-
-        .bot .bubble::before {
-            font-family: "Font Awesome 6 Free";
-            content: "\f0a5";
-            font-weight: 900;
-            position: absolute;
-            left: -18px;
-            bottom: 6px;
-            font-size: 1rem;
-            color: #cbb26a;
-            opacity: 0.6;
-            background: #1a1f24;
-            border-radius: 50%;
-            padding: 3px;
-            border: 1px solid #7b6d46;
-        }
-
-        .user .bubble::after {
-            font-family: "Font Awesome 6 Free";
-            content: "\f007";
-            font-weight: 900;
-            position: absolute;
-            right: -18px;
-            bottom: 6px;
-            font-size: 1rem;
-            color: #cdb46e;
-            opacity: 0.6;
-            background: #1d3527;
-            border-radius: 50%;
-            padding: 3px 4px;
-            border: 1px solid #6f8f72;
         }
 
         .input-area {
             display: flex;
-            padding: 20px 25px 25px 25px;
+            padding: 15px 20px;
             background: linear-gradient(145deg, #1b2125, #13181b);
             border-top: 1px solid #544f3e;
-            gap: 14px;
+            gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .input-wrapper {
@@ -208,85 +188,75 @@
             position: relative;
             display: flex;
             align-items: center;
+            min-width: 200px;
         }
 
         .input-wrapper i {
             position: absolute;
-            left: 18px;
+            left: 15px;
             color: #baa25d;
-            font-size: 1rem;
+            font-size: 0.9rem;
             opacity: 0.9;
-            pointer-events: none;
         }
 
         #input {
             width: 100%;
             background: #0a0d0f;
             border: 2px solid #3c3f3a;
-            border-radius: 50px;
-            padding: 15px 25px 15px 52px;
-            font-size: 1rem;
+            border-radius: 40px;
+            padding: 12px 20px 12px 45px;
+            font-size: 0.95rem;
             color: #ede7d7;
             outline: none;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
         }
 
         #input:focus {
             border-color: #b69e54;
-            background: #111618;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), inset 0 2px 6px #000;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         button {
             background: linear-gradient(145deg, #3c4a54, #1d2b33);
             border: 1.5px solid #ad8f4c;
             color: #f0e8d2;
-            border-radius: 60px;
-            padding: 15px 34px;
-            font-size: 1.05rem;
+            border-radius: 40px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.15s;
-            box-shadow: 0 8px 0 #0a1217, 0 6px 12px black;
             display: flex;
             align-items: center;
-            gap: 8px;
-            letter-spacing: 0.6px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         button i {
             color: #e5c87b;
-            font-size: 1.2rem;
         }
 
         button:hover {
             background: #2f424f;
             border-color: #cfb26b;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 0 #0a1217, 0 8px 16px black;
+            transform: translateY(-1px);
         }
 
         button:active {
-            transform: translateY(4px);
-            box-shadow: 0 4px 0 #0a1217;
+            transform: translateY(2px);
         }
 
-        .connection-status {
-            font-size: 0.8rem;
-            padding: 4px 12px;
-            border-radius: 20px;
-            background: rgba(0,0,0,0.3);
-            margin-left: 10px;
+        .mic-btn {
+            background: linear-gradient(145deg, #4a3c2d, #2b221a);
         }
-        
-        .connected {
-            color: #4caf50;
-        }
-        
-        .disconnected {
-            color: #f44336;
+
+        @media (max-width: 600px) {
+            .header h2 { font-size: 2.2rem; }
+            .status-bar { flex-direction: column; align-items: flex-start; }
+            .action-buttons { width: 100%; }
+            button { flex: 1; justify-content: center; }
         }
     </style>
 </head>
@@ -297,66 +267,77 @@
         <div class="gold-sep"></div>
     </div>
 
-    <div class="status">
-        <i class="fas fa-circle"></i> 
-        <span>Bangla Voice Assistant</span>
-        <span id="apiStatus" class="connection-status disconnected">● Connecting...</span>
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-item">
+                <i class="fas fa-language"></i>
+                <span>Bangla Accent</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-database"></i>
+                <span>Groq AI</span>
+            </div>
+        </div>
+        <div class="api-status" id="apiStatus">
+            <i class="fas fa-circle" id="statusIcon"></i>
+            <span id="statusText">Checking API...</span>
+        </div>
     </div>
 
     <div class="chat-messages" id="chat">
         <div class="message bot">
-            <div class="bubble">নমস্কার! আমি Athena, আপনার ব্যক্তিগত সহায়ক। কিভাবে সাহায্য করতে পারি?</div>
+            <div class="bubble">নমস্কার! আমি Athena। বলো কি খবর? 🎤</div>
         </div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
             <i class="fas fa-pen-nib"></i>
-            <input type="text" id="input" placeholder="এখানে লিখুন...">
+            <input type="text" id="input" placeholder="লিখুন... (type here)">
         </div>
-        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> পাঠান</button>
+        <div class="action-buttons">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> পাঠান</button>
+            <button class="mic-btn" onclick="startVoice()" id="micBtn">
+                <i class="fas fa-microphone"></i> বলুন
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
+    // ================= CONFIGURATION =================
+    const RENDER_API_URL = "https://cutie-ai-1-j4p4.onrender.com";
+    
+    // ================= DOM ELEMENTS =================
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
     const apiStatus = document.getElementById("apiStatus");
-    
-    // ========== Render API URL - এখানে আপনার Render URL দিন ==========
-    const RENDER_API_URL = "https://cutie-ai.onrender.com"; // আপনার Render URL দিন
-    // =================================================================
+    const statusIcon = document.getElementById("statusIcon");
+    const statusText = document.getElementById("statusText");
+    const micBtn = document.getElementById("micBtn");
 
-    function updateApiStatus(connected, message) {
-        if (connected) {
-            apiStatus.innerHTML = '● Connected';
-            apiStatus.className = 'connection-status connected';
-        } else {
-            apiStatus.innerHTML = `● ${message || 'Disconnected'}`;
-            apiStatus.className = 'connection-status disconnected';
-        }
-    }
-
-    // Check API connection on load
-    async function checkApiConnection() {
+    // ================= API STATUS CHECK =================
+    async function checkApiStatus() {
         try {
-            const response = await fetch(`${RENDER_API_URL}/status`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const response = await fetch(`${RENDER_API_URL}/status`);
             if (response.ok) {
                 const data = await response.json();
-                updateApiStatus(true, 'Connected');
-                console.log('API connected:', data);
+                statusIcon.className = "fas fa-circle connected";
+                statusText.innerHTML = "Connected to AI";
+                statusText.style.color = "#4caf50";
+                return true;
             } else {
-                updateApiStatus(false, 'API Error');
+                throw new Error("API error");
             }
         } catch (e) {
-            console.error('API connection failed:', e);
-            updateApiStatus(false, 'Offline');
+            statusIcon.className = "fas fa-circle disconnected";
+            statusText.innerHTML = "API Offline";
+            statusText.style.color = "#f44336";
+            return false;
         }
     }
 
+    // ================= ADD MESSAGE TO CHAT =================
     function addMessage(text, type) {
         const div = document.createElement("div");
         div.className = "message " + type;
@@ -365,6 +346,7 @@
         chat.scrollTop = chat.scrollHeight;
     }
 
+    // ================= SEND MESSAGE TO RENDER API =================
     async function sendMessage(msg = null) {
         const message = msg || input.value.trim();
         if (!message) return;
@@ -373,7 +355,6 @@
         input.value = "";
 
         try {
-            // Render API তে request পাঠানো
             const res = await fetch(`${RENDER_API_URL}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -382,101 +363,123 @@
             
             const data = await res.json();
             addMessage(data.response, "bot");
-            speak(data.response);
+            speakText(data.response);
         } catch (e) {
-            console.warn("Server not reachable:", e);
-            const fallback = "সার্ভার এ সমস্যা। দয়া করে আবার চেষ্টা করুন।";
-            addMessage(fallback, "bot");
-            updateApiStatus(false, 'Offline');
+            console.error("Error:", e);
+            addMessage("⚠️ সার্ভার এ সমস্যা। আবার চেষ্টা করুন।", "bot");
+            checkApiStatus();
         }
     }
 
-    input.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") sendMessage();
-    });
+    // ================= VOICE RECOGNITION (Bangla/English) =================
+    let recognition = null;
+    let isListening = false;
 
-    // ================= VOICE SYSTEM =================
-    let recognition;
-    let listening = false;
+    function startVoice() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("আপনার ব্রাউজার voice recognition support করে না।");
+            return;
+        }
 
-    if ('webkitSpeechRecognition' in window) {
-        recognition = new webkitSpeechRecognition();
-        recognition.continuous = true;
-        recognition.lang = 'bn-BD';  // Bangla language
-        recognition.interimResults = false;
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
 
-        recognition.onresult = function (event) {
-            const transcript = event.results[event.results.length - 1][0].transcript.trim();
-            console.log("Heard:", transcript);
+        try {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'bn-BD'; // Bangla first
+            
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.innerHTML = '<i class="fas fa-stop"></i> থামুন';
+                micBtn.style.background = "linear-gradient(145deg, #4a3c2d, #3a2c1d)";
+            };
 
-            // Wake word check - both English and Bangla
-            if (transcript.toLowerCase().includes("hey cutie") || 
-                transcript.toLowerCase().includes("কিউটি") ||
-                transcript.toLowerCase().includes("আথেনা")) {
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                console.log("Voice heard:", transcript);
                 
-                let command = transcript.toLowerCase()
-                    .replace("hey cutie", "")
-                    .replace("কিউটি", "")
-                    .replace("আথেনা", "")
-                    .trim();
-                
-                command = command.replace(/^[.,!?;:]+/, '').trim();
-                
-                if (command.length > 0) {
-                    sendMessage(command);
+                // Check for wake words
+                const lower = transcript.toLowerCase();
+                if (lower.includes("কিউটি") || lower.includes("আথেনা") || lower.includes("cutie")) {
+                    let command = transcript.replace(/কিউটি|আথেনা|cutie/gi, "").trim();
+                    if (command) {
+                        sendMessage(command);
+                    } else {
+                        sendMessage("হ্যালো");
+                    }
                 } else {
-                    sendMessage("হ্যালো");   // polite nudge
+                    // Direct command without wake word
+                    sendMessage(transcript);
                 }
-            }
-        };
+            };
 
-        recognition.onerror = function (event) {
-            console.log("Voice error:", event.error);
-        };
+            recognition.onerror = (event) => {
+                console.log("Voice error:", event.error);
+                resetMicButton();
+            };
 
-        recognition.start();
-        listening = true;
-    } else {
-        const statusDiv = document.querySelector('.status');
-        if (statusDiv) {
-            statusDiv.innerHTML = `<i class="fas fa-microphone-slash" style="color:#b48b5a;"></i> Voice not supported`;
+            recognition.onend = () => {
+                resetMicButton();
+            };
+
+            recognition.start();
+        } catch (e) {
+            console.error("Voice init error:", e);
+            resetMicButton();
         }
     }
 
-    // Text-to-Speech with Bangla support
-    function speak(text) {
+    function resetMicButton() {
+        isListening = false;
+        micBtn.innerHTML = '<i class="fas fa-microphone"></i> বলুন';
+        micBtn.style.background = "linear-gradient(145deg, #4a3c2d, #2b221a)";
+    }
+
+    // ================= TEXT TO SPEECH (Bangla accent) =================
+    function speakText(text) {
         if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const speech = new SpeechSynthesisUtterance(text);
         
-        // Try Bangla voice first
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        
+        // Try to get Bangla voice
         const voices = window.speechSynthesis.getVoices();
         const banglaVoice = voices.find(v => v.lang.includes('bn') || v.lang.includes('ben'));
         const indianVoice = voices.find(v => v.lang === 'en-IN');
         
         if (banglaVoice) {
-            speech.voice = banglaVoice;
-            speech.lang = 'bn-BD';
+            utterance.voice = banglaVoice;
+            utterance.lang = 'bn-BD';
         } else if (indianVoice) {
-            speech.voice = indianVoice;
-            speech.lang = 'en-IN';
+            utterance.voice = indianVoice;
+            utterance.lang = 'en-IN';
         }
         
-        speech.rate = 0.9;
-        speech.pitch = 1.2;
-        window.speechSynthesis.speak(speech);
+        window.speechSynthesis.speak(utterance);
     }
 
-    if (window.speechSynthesis) {
-        window.speechSynthesis.getVoices();
-    }
+    // ================= EVENT LISTENERS =================
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
 
-    // Check API connection on load
-    checkApiConnection();
-    // Check every 30 seconds
-    setInterval(checkApiConnection, 30000);
+    // ================= INITIALIZATION =================
+    window.onload = () => {
+        checkApiStatus();
+        setInterval(checkApiStatus, 30000); // Check every 30 seconds
+        
+        // Preload voices
+        if (window.speechSynthesis) {
+            window.speechSynthesis.getVoices();
+        }
+    };
 </script>
-<!-- small classic signature -->
-<div style="position: fixed; bottom: 6px; right: 20px; opacity:0.3; font-size: 12px; color: #bba十五;">Athena · CUTIE AI</div>
 </body>
 </html>
